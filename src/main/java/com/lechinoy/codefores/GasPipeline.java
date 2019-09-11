@@ -1,5 +1,7 @@
 package com.lechinoy.codefores;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -7,7 +9,6 @@ import java.util.Scanner;
  * @date 2019/9/10 11:04
  */
 public class GasPipeline {
-
 
     public static void main(String[] args) {
 
@@ -18,11 +19,11 @@ public class GasPipeline {
 
         while (groupCount > 0) {
 
-            int length = scanner.nextInt();
+            long length = scanner.nextInt();
 
-            int a = scanner.nextInt();//管道
+            long a = scanner.nextLong();//管道
 
-            int b = scanner.nextInt();//支柱
+            long b = scanner.nextInt();//支柱
 
             String data = scanner.next();
 
@@ -34,8 +35,7 @@ public class GasPipeline {
 
     }
 
-
-    private static void getMinCost(int length, int a, int b, String data) {
+    private static void getMinCost(long length, long a, long b, String data) {
 
         String[] array = data.split("");
 
@@ -44,43 +44,56 @@ public class GasPipeline {
             System.out.println(b * 2 + a);
         }
 
-        int state = 0;// 0 or 1 记录当前位置
+        int state = 1;// 0 or 1 记录当前位置
 
         long sum = 0; //总花费
 
         sum = sum + b;
 
+        List<Integer> list = new ArrayList<Integer>();
+
         for (int i = 0; i < length; i++) {
 
-            if (state == 0) {//高度为1
+            if (state == 1) {//高度为1
 
                 if (i + 1 >= length) {
                     sum = sum + a + b;
                     break;
                 }
 
-                if (array[i + 1].equals("1") && array[i].equals("0")) {//
-                    long item = a >= b ? 2 * b + a + b : 2 * b + 2 * a;
-                    sum = sum + item;
-                    state = 1;
+                if (array[i + 1].equals("1")) {
+                    sum = sum + 2 * a + 2 * b;
+                    state = 2;//高度变为2 高度升上去不做改变
                 } else {
                     sum = sum + a + b;
                 }
 
             } else {//高度为2
+                int size = list.size();
 
-                if (i + 1 >= length) {
-                    int item = a >= b ? 2 * b + a : 2 * a + b;
-                    sum = sum + item;
+                if (i + 1 >= length) {//超过长度时
+
+                    if (list.size() == 0) {
+                        sum = sum + Math.min(a + 2 * b, 2 * a + b);
+                    } else {
+                        list.add(0);
+                        size=list.size();
+                        sum = sum + Math.min(size * a + size * 2 * b, size * a + a + size * b);
+                        list.clear();
+                    }
                     break;
                 }
 
-                if (array[i + 1].equals("0") && array[i].equals("0")) {
-                    long item = a >= b ? 2 * b + a : 2 * a + b;
-                    sum = sum + item;
-                    state = a == b ? 1 : 0;
-                } else {
-                    sum = sum + a + 2 * b;
+                if (array[i].equals("0")) {
+                    list.add(0);
+                } else {//当前位置为1
+                    if (list.isEmpty() || list.size() == 1) {
+                        sum = sum + (size + 1) * (a + 2 * b);
+                        list.clear();
+                    } else {
+                        sum = sum + Math.min(2 * a + size * a + (size - 1) * b + a + 4 * b, (size + 1) * a + (size + 1) * 2 * b);
+                        list.clear();
+                    }
                 }
             }
 
