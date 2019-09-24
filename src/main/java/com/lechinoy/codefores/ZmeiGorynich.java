@@ -155,34 +155,38 @@ public class ZmeiGorynich {
         dragonList.forEach(dragon -> {
 
             final Blow[] best = {null};
+            final Blow[] max = {null};
 
-            dragon.getBlows().stream().filter(Blow::isAble).forEach(blow -> {
-
-                if (best[0] == null) {
+            dragon.getBlows().forEach(blow -> {
+                //查找最优的技能
+                if ((best[0] == null || blow.getX() > best[0].getX() || blow.getX() == best[0].getX() && blow.getD() > best[0].getD()) && blow.isAble()) {
                     best[0] = blow;
-                } else {
-                    if (blow.getX() > best[0].getX() || blow.getX() == best[0].getX() && blow.getD() > best[0].getD()) {
-                        best[0] = blow;
-                    }
+                }
+                //查找最后一次使用的技能
+                if (max[0] == null || blow.getD() > max[0].getD()) {
+                    max[0] = blow;
                 }
             });
 
-            if (best[0] == null) {
-                System.out.println(-1);
+            int tmp = dragon.getX() - max[0].getD();
+
+            if (tmp <= 0) {
+                System.out.println(1);
             } else {
-
-                if (dragon.getX() / best[0].getX() == 0) {
-                    System.out.println(dragon.getX() / best[0].getX());
+                if (best[0] == null) {
+                    System.out.println(-1);
                 } else {
-                    System.out.println(dragon.getX() / best[0].getX() + 1);
+                    if (tmp % best[0].getX() == 0) {
+                        System.out.println(tmp / best[0].getX() + 1);
+                    } else {
+                        System.out.println(tmp / best[0].getX() + 1 + 1);
+                    }
                 }
+
             }
-
-
         });
 
 
     }
-
 
 }
